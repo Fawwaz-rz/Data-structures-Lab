@@ -1,0 +1,113 @@
+﻿#include <iostream>
+#include <string>
+
+
+using namespace std;
+
+
+struct Task {
+    string title;
+    int dueDate;
+    Task* next;
+
+
+    Task(const string& t, int d) : title(t), dueDate(d), next(nullptr) {}
+};
+
+
+void insertTask(Task*& head, const string& title, int dueDate) {
+    Task* newTask = new Task(title, dueDate);
+
+
+    if (!head || dueDate < head->dueDate || (dueDate == head->dueDate && newTask < head)) {
+        newTask->next = head;
+        head = newTask;
+    } else {
+        Task* current = head;
+        while (current->next && (dueDate > current->next->dueDate ||
+               (dueDate == current->next->dueDate && newTask > current->next))) {
+            current = current->next;
+        }
+        newTask->next = current->next;
+        current->next = newTask;
+    }
+}
+
+
+void markAsComplete(Task*& todoHead, Task*& completedHead, const string& completedTitle) {
+    Task* current = todoHead;
+    Task* prev = nullptr;
+
+
+    while (current && current->title != completedTitle) {
+        prev = current;
+        current = current->next;
+    }
+
+
+    if (current) {
+        if (prev) {
+            prev->next = current->next;
+        } else {
+            todoHead = current->next;
+        }
+
+
+        current->next = completedHead;
+        completedHead = current;
+
+
+        cout << "Task marked as complete: " << completedTitle << endl;
+    } else {
+        cout << "Task not found in the to-do list." << endl;
+    }
+}
+
+
+void viewUpcomingTasks(const Task* head) {
+    cout << "Upcoming Tasks:" << endl;
+
+
+    while (head) {
+        cout << "Title: " << head->title << ", Due Date: " << head->dueDate << " days" << endl;
+        head = head->next;
+    }
+}
+
+
+void viewCompletedTasks(const Task* head) {
+    cout << "Completed Tasks:" << endl;
+
+
+    while (head) {
+        cout << "Title: " << head->title << ", Due Date: " << head->dueDate << " days" << endl;
+        head = head->next;
+    }
+}
+
+
+int main() {
+    Task* toDoList = nullptr;
+    Task* completedList = nullptr;
+
+
+    insertTask(toDoList, "Complete Project", 7);
+    insertTask(toDoList, "Submit Report", 5);
+    insertTask(toDoList, "Prepare Presentation", 10);
+
+
+    viewUpcomingTasks(toDoList);
+
+
+    markAsComplete(toDoList, completedList, "Complete Project");
+
+
+    viewUpcomingTasks(toDoList);
+    viewCompletedTasks(completedList);
+
+
+    
+
+
+    return 0;
+}

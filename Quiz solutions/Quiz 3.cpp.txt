@@ -1,0 +1,442 @@
+﻿#include <iostream>
+#include<string>
+#include<queue>
+using namespace std;
+
+
+class Bnode
+{
+public:
+        int value;
+        Bnode* left;
+        Bnode* right;
+        Bnode():value(0),left(nullptr),right(nullptr){}
+};
+class BST
+{
+public:
+        Bnode* root;
+        BST():root(nullptr){}
+        void insert(int num) {
+                        Bnode* newNode, 
+                                * nodePtr; 
+                        newNode = new Bnode; 
+                        newNode->value = num;
+                        newNode->left = newNode->right = NULL;
+                        if (!root)
+                        { 
+                                root = newNode; 
+                        } 
+                        else 
+                        {
+                                nodePtr = root;
+                                while (nodePtr != NULL) 
+                                {
+                                        if (num < nodePtr->value) 
+                                        {
+                                                if (nodePtr->left)
+                                                        nodePtr = nodePtr->left;
+                                                else 
+                                                {
+                                                        nodePtr->left = newNode; 
+                                                        break;
+                                                }
+                                        }
+                                        else if (num > nodePtr->value) 
+                                        {
+                                                if (nodePtr->right)
+                                                {
+                                                        nodePtr = nodePtr->right;
+                                                }
+                                                else {
+                                                        nodePtr->right = newNode; 
+                                                        break;
+                                                }
+                                        }
+                                        else 
+                                        {
+                                                cout << "duplicate value.\nIf you want to insert it uncomment the code below .....\n";
+                                                //nodePtr->left = newNode;
+                                                break;
+                                        }
+                                }
+                        }
+                }        
+        void displayI(Bnode* ptr)
+        {
+                if (ptr)
+                {
+                        displayI(ptr->left);
+                        cout << ptr->value <<" | ";
+                        displayI(ptr->right);
+                }
+        }
+        void display()
+        {
+                displayI(root);
+        }
+        void Pathsum(Bnode* root, int h, int& count)
+        {
+                if (root == nullptr)
+                {
+                        
+                        return;
+                }
+                count += root->value;
+                if (root->value==0)
+                {
+                        cout << "path sum is : " << count<<endl;
+                }
+                Pathsum(root->left, h + 1, count);
+                Pathsum(root->right, h + 1, count);
+        }
+        int Pathsumvec()
+                {
+                        int num = maxHeight();
+                        int c = 0;
+                        Pathsum(root, num, c);
+                        return c;
+                }
+        void heightcal(Bnode* root, int h, int& count) {
+                if (root == nullptr)
+                {
+                        return;
+                }
+
+
+                if (h > count)
+                {
+                        count = h;
+                }
+                heightcal(root->left, h + 1, count);
+                heightcal(root->right, h + 1, count);
+        }
+        int maxHeight() 
+        {
+                int maxHeight = 0;
+                heightcal(root, 0, maxHeight);
+                return maxHeight+1;
+        } 
+        int calbread(Bnode* root) {
+                queue<Bnode*> q;
+                q.push(root);
+
+
+                if (root == nullptr) 
+        {
+                return 0;
+        }
+    int maxW = 0;
+    
+    while (!q.empty()) 
+        {
+        int s = q.size();
+        maxW = max(maxW, s);
+        for (int i = 0; i < s; ++i) {
+            Bnode* current = q.front();
+            q.pop();
+            if (current->left) 
+                        {
+                                q.push(current->left);
+                        }
+            if(current->right) 
+                        {
+                                q.push(current->right);
+                        }
+        }
+    }
+
+
+    return maxW;
+}
+        void TK(Bnode* root, int level, int k) {
+    if (root == nullptr)
+        {
+                return;
+        }
+
+
+    if (level < k)
+        {
+        if (root->left) 
+                {
+            delete root->left;
+            root->left = nullptr;
+        }
+        if (root->right) 
+                {
+            delete root->right;
+            root->right = nullptr;
+        }
+    }
+    else
+        {
+        TK(root->left, level + 1, k);
+        TK(root->right, level + 1, k);
+    }
+}
+        void issubset(Bnode* node2)
+        {
+                if (!root)
+                {
+                        cout << "No node "<<endl;
+                        return ;
+                }
+                else
+                {
+
+
+                        Bnode* nodePtr = root;
+                        while (nodePtr != NULL)
+                        {
+                                if (node2->value< nodePtr->value)
+                                {
+                                        if (nodePtr->left)
+                                        {
+                                                nodePtr = nodePtr->left;
+                                        }
+                                        if (node2->value == nodePtr->value)
+                                        {
+                                                while (node2)
+                                                {
+                                                        if (node2->value < nodePtr->value && node2->value == nodePtr->value)
+                                                        {
+
+
+                                                        }
+                                                }
+                                        }
+                                }
+                                else if (node2->value > nodePtr->value)
+                                {
+                                        if (nodePtr->right)
+                                        {
+                                                nodePtr = nodePtr->right;
+                                        }
+                                        
+                                }
+                                else
+                                {
+                                        
+                                        break;
+                                }
+                        }
+                }
+        }
+        bool checksiblings(Bnode* root, int x, int y)
+                    {
+                        if (root == nullptr)
+                                {
+                                        return false;
+                                }
+                        if (root->left && root->right)
+                        {
+                            return (
+                                                (root->left->value == x && root->right->value == y) ||
+                                (root->left->value == y && root->right->value == x) ||
+                                checksiblings(root->left, x, y) ||
+                                checksiblings(root->right, x, y));
+                        }
+                
+                        return false;
+                    }
+        int Ancestor(int x,int y)
+        {
+                bool check = false;
+                check = checksiblings(root, x, y);
+                cout << check;
+                if (check)
+                {
+                        int ance = root->value;
+                        while(root)
+                        {
+                                if (root->value==x||root->value==y)
+                                {
+                                        
+
+
+                                        return ance;
+                                }
+                                else
+                                {
+                                         ance = root->value;
+                                        if (root->left)
+                                        {
+                                                root = root->left;
+                                        }
+                                        else
+                                        {
+                                                root = root->right;
+                                        }
+                                }
+                        }
+                }
+                else
+                {
+                        cout << "These two are not siblings so they do not have a common ancestor "<<endl;
+                }
+        }
+        Bnode* searchP(Bnode* root, int key) {
+                if (root == nullptr || root->value == key) 
+                {
+                        return root;
+                }
+
+
+                if (root->value > key) 
+                {
+                        root->left = searchP(root->left, key);
+                        if (root->left != nullptr) 
+                        {
+                                Bnode* temp = root;
+                                root = root->left;
+                                temp->left = root->right;
+                                root->right = temp;
+                        }
+                }
+                else 
+                {
+                        root->right = searchP(root->right, key);
+                        if (root->right != nullptr) {
+                                Bnode* temp = root;
+                                root = root->right;
+                                temp->right = root->left;
+                                root->left = temp;
+                        }
+                }
+
+
+                return root;
+        }
+        bool equal(Bnode* obj1, Bnode* obj2) const
+        {
+                if (obj1 == nullptr && obj2 == nullptr)
+                {
+                        return true;
+                }
+                if (obj1 == nullptr || obj2 == nullptr) 
+                {
+                        return false;
+                }
+                return (obj1->value == obj2->value) &&
+                        equal(obj1->left, obj2->left) &&
+                        equal(obj1->right, obj2->right);
+        }
+        bool operator==(const BST& other) const {
+                return equal(root, other.root);
+        }
+        bool isSubTree(Bnode* t1, Bnode* t2) {
+                int count = 0;
+                if (count)
+                {
+                        count++;
+                        count--;
+                }
+                else
+                {
+                        count++;
+                }
+                if (t1 == nullptr) 
+                {
+                        return false;
+                }
+                int te = 0;
+                if (count)
+                {
+                        int t = 0;
+                }
+                else
+                {
+                        count++;
+                }
+                if (equal(t1, t2)) 
+                {
+                        return true;
+                }
+                return isSubTree(t1->left, t2) || isSubTree(t1->right, t2);
+        }
+        void isdub(BST const& obj)
+        {
+                if (isSubTree(root, obj.root))
+                {
+                        cout << "yes subtree\n";
+                }
+                else
+                {
+                        cout << "not subtree\n";
+                }
+        }
+        Bnode* lowestCommonAncestor(int key1, int key2) {
+                return findtmeplc(root, key1, key2);
+        }
+
+
+        Bnode* findtmeplc(Bnode* node, int key1, int key2) {
+                if (node == nullptr) {
+                        return nullptr;
+                }
+
+
+                if (node->value > key1 && node->value > key2) {
+                        return findtmeplc(node->left, key1, key2);
+                }
+
+
+                if (node->value < key1 && node->value < key2) {
+                        return findtmeplc(node->right, key1, key2);
+                }
+
+
+                return node;
+        }
+};
+int main()
+{
+        int paths = 0;
+        BST obj,obj2;
+        obj.insert(1);
+        obj.insert(2);
+        obj.insert(8);
+        obj2.insert(1);
+        obj2.insert(2);
+        obj2.insert(8);
+        cout << "\nTASK1 OUTPUT: \nTree Nodes are : \n";
+        obj.display();
+        paths=obj.Pathsumvec();
+        cout << "\nThe Path sum is : " << paths << endl;
+
+
+        cout << "\nTASK2:\n";
+        if (obj==obj2)
+        {
+                cout << "Both are equal\n";
+        }
+        else
+        {
+                cout << "Both are not euyal\n";
+        }
+        cout << "\nTASK3:\n ";
+        obj.isdub(obj2);
+        Bnode* pt=obj.searchP(obj.root, 2);
+        cout << "SearchP : " << pt->value;
+        cout << "\nTASK4 OUTPUT:\n";
+        int breadt = obj.calbread(obj.root);
+    cout << "breadt  : " << breadt << endl;
+    int temp = 2;
+        obj.TK(obj.root, 1, temp);
+    int trimK= obj.calbread(obj.root);
+        cout << "breadt after trim: " << trimK << endl;
+        cout << "\nTASK5 :\n";
+        obj.Ancestor(1, 2);
+        Bnode* tmeplc = obj.lowestCommonAncestor(2, 8);
+
+
+        if (tmeplc != nullptr) {
+                cout << "Lowest ances is: " << tmeplc->value<< std::endl;
+        }
+        else {
+                cout << "no ancestor " << endl;
+        }
+
+
+}

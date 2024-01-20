@@ -1,0 +1,234 @@
+﻿#include<iostream>
+#include<vector>
+#include<string>
+using namespace std;
+struct Node
+{
+public:
+        string ISBN;
+        Node* left;
+        Node* right;
+        Node(string d):ISBN(d),left(NULL),right(NULL){}
+};
+class BST
+{
+public:
+        Node* root;
+        BST()
+        {
+                root = NULL;
+        }
+        void insertNode(string num)
+        {
+                Node* newNode, 
+                        * nodePtr; 
+                newNode = new Node(num);
+                newNode->ISBN = num;
+                newNode->left = newNode->right = NULL;
+                if (!root) { root = newNode; } 
+                else {
+                        nodePtr = root;
+                        while (nodePtr != NULL) {
+                                if (num < nodePtr->ISBN) {
+                                        if (nodePtr->left)
+                                                nodePtr = nodePtr->left;
+                                        else {
+                                                nodePtr->left = newNode; break;
+                                        }
+                                }
+                                else if (num > nodePtr->ISBN) {
+                                        if (nodePtr->right)
+                                                nodePtr = nodePtr->right;
+                                        else {
+                                                nodePtr->right = newNode; break;
+                                        }
+                                }
+                                else {
+                                        cout << "Duplicate value found.\n"; break;
+                                }
+                        }
+                }
+        }
+        void traversal(Node* nodePtr)
+        {
+                if (nodePtr)
+                {
+                        traversal(nodePtr->left);
+                        cout << nodePtr->ISBN<< endl;
+                        traversal(nodePtr->right);
+                }
+        }
+        void deleteNode(string str, Node*& nodePtr)
+        {
+                if (nodePtr == NULL)
+                {
+                        cout << "not found";
+                }
+                else if (str < nodePtr->ISBN)
+                {
+                        deleteNode(str, nodePtr->left);
+                }
+                else if (str > nodePtr->ISBN)
+                {
+                        deleteNode(str, nodePtr->right);
+                }
+                else 
+                {
+                        makeDeletion(nodePtr);
+                }
+        }
+        void makeDeletion(Node*& nodePtr) {
+                Node* tempNodePtr; 
+                if (nodePtr->right == NULL)
+                {
+                        tempNodePtr = nodePtr;
+                        nodePtr = nodePtr->left;                         
+                        delete tempNodePtr;
+                }
+                else if (nodePtr->left == NULL) 
+                { 
+                        tempNodePtr = nodePtr;
+                        nodePtr = nodePtr->right;
+                        delete tempNodePtr;
+                }
+                else 
+                { 
+                        tempNodePtr = nodePtr->right; 
+                        while (tempNodePtr->left) 
+                        { 
+                                tempNodePtr = tempNodePtr->left;
+                        }
+                        tempNodePtr->left = nodePtr->left; 
+                        tempNodePtr = nodePtr; 
+                        nodePtr = nodePtr->right; 
+                        delete tempNodePtr;
+                }
+        }
+        void heightcal(Node* root, int h, int& count) {
+                if (root == nullptr)
+                {
+                        return;
+                }
+
+
+                if (h > count)
+                {
+                        count = h;
+                }
+                heightcal(root->left, h + 1, count);
+                heightcal(root->right, h + 1, count);
+        }
+        int maxHeight() 
+        {
+                int maxHeight = 0;
+                heightcal(root, 0, maxHeight);
+                return maxHeight+1;
+        }
+        void depthcal(Node* root, int h, int& count,string str,bool& check)
+        {
+                if (root == nullptr)
+                {
+                        return;
+                }
+
+
+                if (h > count)
+                {
+                        count = h;
+                }
+                if (!str.compare(root->ISBN))
+                {
+                        cout << "the depth is : " << count + 1<<endl;
+                        check = true;
+                }
+                depthcal(root->left, h + 1, count,str, check);
+                depthcal(root->right, h + 1, count, str, check);
+        }
+        bool isBalancedUtil(Node* root) {
+                if (root == nullptr)
+                        return true;
+                int count = 0;
+                heightcal(root->left, 0, count);
+                int lh = count;
+                heightcal(root->right, 0, count);
+                int rh = count;
+                if (abs(lh- rh) <= 1 &&
+                        isBalancedUtil(root->left) &&
+                        isBalancedUtil(root->right))
+                {
+                        return true;
+                }
+
+
+                return false;
+        }
+        void Pathsum(Node* root, int h, int& count)
+        {
+                if (root == nullptr)
+                {
+                        
+                        return;
+                }
+                int num = stoi(root->ISBN);
+                count += num;
+                if (root->ISBN.compare("0"))
+                {
+                        cout << "path sum is : " << count<<endl;
+                }
+                Pathsum(root->left, h + 1, count);
+                Pathsum(root->right, h + 1, count);
+        }
+};
+//template <typename T>
+//class bst 
+//{
+//public:
+//        Node* rootbst;
+//        T arr[];
+//        int size;
+//        bst(T& array1[],int n):arr(array1),size(n),rootbst(nullptr)
+//        {
+//
+//        }
+//};
+
+
+int main()
+{
+        BST obj;
+        obj.insertNode("1234");
+        obj.insertNode("567");
+        obj.insertNode("2346");
+        obj.insertNode("54346");
+        obj.insertNode("0");
+        cout << "The height is :  " << obj.maxHeight()<<endl; 
+        int count = 0;
+        bool check= false;
+        obj.depthcal(obj.root, 0, count, "1234", check);
+        if (check==false)
+        {
+                cout << "not found\n";
+        }
+        
+        if (obj.isBalancedUtil(obj.root))
+        {
+                cout << "balanced";
+        }
+        else
+        {
+                cout << "not balanced";
+        }
+        obj.traversal(obj.root);
+        obj.deleteNode("123", obj.root);
+        obj.traversal(obj.root);
+        vector<string> vec;
+        vec.push_back("1");
+        vec.push_back("2");
+        vec.push_back("3");
+        vec.push_back("4");
+        vec.push_back("5");
+        int n = 0;
+         obj.Pathsum(obj.root, 0, n);
+
+
+}
